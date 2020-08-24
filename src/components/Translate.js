@@ -2,8 +2,6 @@ import React, { useState } from "react";
 import Dropdown from "./Dropdown";
 import Convert from "./Convert";
 
-
-
 const options = [
   {
     label: "Afrikaans",
@@ -30,17 +28,13 @@ const Translate = () => {
   return (
     <div>
       <div className="ui form">
+        <h1>Note: This app only works on localhost:3000, because it uses a paid API.</h1>
         <div className="field">
           <label>Enter Text</label>
           <input value={text} onChange={(e) => setText(e.target.value)} />
         </div>
       </div>
-      <Dropdown
-        label="Select a Language"
-        options={options}
-        selected={language}
-        onSelectedChange={setLanguage}
-      />
+      <Dropdown label="Select a Language" options={options} selected={language} onSelectedChange={setLanguage} />
       <hr />
       <h3 className="ui header">Output</h3>
       <Convert text={text} language={language} />
