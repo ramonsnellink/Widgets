@@ -3,6 +3,18 @@ import axios from "axios";
 
 const Convert = ({ language, text }) => {
   const [translated, setTranslated] = useState("");
+  const [debouncedText, setDebouncedText] = useState(text);
+
+  //deBounce function.
+  useEffect(() => {
+    const timerId = setTimeout(() => {
+      setDebouncedText(text);
+    }, 500);
+
+    return () => {
+      clearTimeout(timerId);
+    };
+  }, [text]);
 
   useEffect(() => {
     // we set up a helper function, because otherwise we can't use async in useEffect
@@ -13,7 +25,7 @@ const Convert = ({ language, text }) => {
         {},
         {
           params: {
-            q: text,
+            q: debouncedText,
             target: language.value,
             key: "AIzaSyCHUCmpR7cT_yDFHC98CZJy2LTms-IwDlM",
           },
@@ -24,7 +36,7 @@ const Convert = ({ language, text }) => {
     };
 
     doTranslation(); // don't forget to run the helper function
-  }, [language, text]); //re-run on language or text change.
+  }, [language, debouncedText]); //re-run on language or text change.
 
   return (
     <div>

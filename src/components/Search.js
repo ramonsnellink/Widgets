@@ -3,13 +3,24 @@ import axios from "axios";
 
 const Search = () => {
   const [term, setTerm] = useState("Programming");
+  const [debouncedTerm, setDebouncedTerm] = useState(term);
   const [results, setResults] = useState([]);
 
-  console.log(results);
+  // This useEffect runs every time a user types (term is updated)
+  useEffect(() => {
+    const timerId = setTimeout(() => {
+      setDebouncedTerm(term); // we update deBouncedTerm. When this updates, we run the 2nd useEffect
+    }, 1000);
+
+    return () => {
+      // Cleanup function. The next time the users types is resets the timeout.
+      // If the user didn't type (and useEffect didn't trigger), 1000ms goes by and search is invoked
+      clearTimeout(timerId);
+    };
+  }, [term]);
 
   useEffect(() => {
     // helper function because you can't use async before the callback function
-
     const search = async () => {
       const { data } = await axios.get("https://en.wikipedia.org/w/api.php", {
         params: {
@@ -17,32 +28,15 @@ const Search = () => {
           list: "search",
           origin: "*",
           format: "json",
-          srsearch: term,
+          srsearch: debouncedTerm,
         },
       });
 
       // Assign the data to results state
       setResults(data.query.search);
     };
-
-    if (term && !results.length) {
-      // if there is no result (so first load)
-      search();
-    } else {
-      // Search after 1000ms
-      const timeoutId = setTimeout(() => {
-        if (term) {
-          search();
-        }
-      }, 1000);
-
-      // Cleanup function. The next time the users types is resets the timeout.
-      // If the user didn't type (and useEffect didn't trigger), 500ms goes by and search is invoked
-      return () => {
-        clearTimeout(timeoutId);
-      };
-    }
-  }, [term, results.length]);
+    search();
+  }, [debouncedTerm]);
 
   const renderedResults = results.map((result) => {
     //remove spans
