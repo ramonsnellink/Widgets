@@ -42,7 +42,7 @@ const Search = () => {
         clearTimeout(timeoutId);
       };
     }
-  }, [term]);
+  }, [term, results.length]);
 
   const renderedResults = results.map((result) => {
     //remove spans

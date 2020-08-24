@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 
-const Dropdown = ({ options, selected, onSelectedChange }) => {
+const Dropdown = ({ label, options, selected, onSelectedChange }) => {
   const [open, setOpen] = useState(false);
   const ref = useRef();
 
@@ -10,14 +10,22 @@ const Dropdown = ({ options, selected, onSelectedChange }) => {
   // We do this because otherwise the menu won't close if the user clicks anywhere on the screen to close.
 
   useEffect(() => {
-    document.body.addEventListener("click", (event) => {
+    const onBodyClick = (event) => {
       //Check if the current ref contains the item that was clicked.
       if (ref.current.contains(event.target)) {
         return;
       }
       setOpen(false);
-    });
-  }, []);
+    };
+    document.body.addEventListener("click", onBodyClick);
+
+    //Cleanup function. Remove the event listener if the element gets removed
+    //Otherwise we get an error because ref can't be found.
+
+    return () => {
+      document.body.removeEventListener("click", onBodyClick);
+    };
+  }, []); // empty array = only runs when the element is rendered
 
   const renderedOptions = options.map((option) => {
     if (option.value === selected.value) {
@@ -34,7 +42,7 @@ const Dropdown = ({ options, selected, onSelectedChange }) => {
   return (
     <div className="ui form" ref={ref}>
       <div className="field">
-        <label className="label">Select a Color</label>
+        <label className="label">{label}</label>
         <div
           onClick={() => setOpen(!open)} //set open to the opposite of it's current value
           className={`ui selection dropdown ${open ? "visible active" : ""}`}
